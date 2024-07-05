@@ -644,9 +644,21 @@ class GDAL2Tiles(object):
         self.input = None
         self.output = None
 
+        # RUN THE ARGUMENT PARSER:
+
+        self.optparse_init()
+        (self.options, self.args) = \
+            self.parser.parse_args(args=arguments)
+        if not self.args:
+            self.error('No input file specified')
+
+        # POSTPROCESSING OF PARSED ARGUMENTS:
+
+        # Workaround for old versions of GDAL
+
         # Tile format
 
-        self.tilesize = 256
+        self.tilesize = self.options.tilesize
         self.tiledriver = 'PNG'
         self.tileext = 'png'
 
@@ -668,18 +680,6 @@ class GDAL2Tiles(object):
         # Otherwise the overview tiles are generated from existing underlying tiles
 
         self.overviewquery = False
-
-        # RUN THE ARGUMENT PARSER:
-
-        self.optparse_init()
-        (self.options, self.args) = \
-            self.parser.parse_args(args=arguments)
-        if not self.args:
-            self.error('No input file specified')
-
-        # POSTPROCESSING OF PARSED ARGUMENTS:
-
-        # Workaround for old versions of GDAL
 
         try:
             if self.options.verbose and self.options.resampling \
@@ -848,6 +848,8 @@ gdal_vrtmerge.py -o merged.vrt %s"""
         p.add_option('-v', '--verbose', action='store_true',
                      dest='verbose',
                      help='Print status messages to stdout')
+        p.add_option('-q', '--tilesize',dest='tilesize', action='store', type="int",
+                    help= 'Change size of tiles generated. Default 256 (Only tested with leaflet, e.g. -q 512) for 512px')
 
         # KML options
 
@@ -893,7 +895,6 @@ gdal_vrtmerge.py -o merged.vrt %s"""
          help='Bing Maps API key from https://www.bingmapsportal.com/'
          ), )
         p.add_option_group(g)
-
         # TODO: MapFile + TileIndexes per zoom level for efficient MapServer WMS
             # g = OptionGroup(p, "WMS MapServer metadata", "Options for generated mapfile and tileindexes for MapServer")
             # g.add_option("-i", "--tileindex", dest='wms', action="store_true"
@@ -911,6 +912,7 @@ gdal_vrtmerge.py -o merged.vrt %s"""
             resume=False,
             googlekey='INSERT_YOUR_KEY_HERE',
             bingkey='INSERT_YOUR_KEY_HERE',
+            tilesize=256
             )
 
         self.parser = p
