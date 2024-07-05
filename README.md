@@ -1,3 +1,7 @@
+> Forked Version of original: commenthol gdal2tiles-leaflet:master
+This adds the option `-q` to change the tilesize of generated tiles in CLI. Not tested properly, so if used ensure that ``Imagesize / tilesize`` returns !float.
+Support for multithreaded has not been added.
+
 # gdal2tiles-leaflet
 
 > Generate raster image tiles for use with leaflet.
